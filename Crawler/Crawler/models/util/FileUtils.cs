@@ -5,6 +5,18 @@ namespace Crawler.models.util;
 
 public static class FileUtil
 {
+    private const string ErrorLogPath = "log.txt";
+
+    static FileUtil()
+    {
+        File.Delete(ErrorLogPath);
+    }
+
+    public static void WriteError(string message)
+    {
+        File.AppendAllText(ErrorLogPath,message + "\n");
+    }
+
     public static void Export(string sourcePath, string destinationPath, string format)
     {
         var students = LoadStudentsFromCsv(sourcePath);
@@ -18,13 +30,16 @@ public static class FileUtil
     {
         var studentCsvReader = new StreamReader(new FileInfo(sourcePath).OpenRead());
         var students = new HashSet<Student>();
+        var rowNumber = 1;
         while (studentCsvReader.ReadLine() is { } line)
         {
-            var student = Student.CreateStudent(line);
+            var student = Student.CreateStudent(rowNumber, line);
             if (student != null)
             {
                 students.Add(student);
             }
+
+            rowNumber++;
         }
 
         return students;
